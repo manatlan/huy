@@ -298,7 +298,7 @@ async def request(url,data=None,headers={}):    # mimic urllib.Request() (GET & 
                     return Response(resp.status,await resp.text(), headers=resp.headers)
             else:
                 async with session.get(url,headers=headers,ssl=False) as resp:
-                    return Response(resp.status,await resp.text(), headers=resp.headers)
+                    return Response(resp.status,await resp.text(encoding='utf-8'), headers=resp.headers)
         except aiohttp.client_exceptions.ClientConnectorError as e:
             return Response(None,str(e))
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
