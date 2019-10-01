@@ -757,7 +757,8 @@ class Base:
                         web.route("*", "/{path:.+}", handleWeb),
                      ]
 
-            application = web.Application()
+            client_max_size = cls._kwargs.get('client_max_size', 1024**2)
+            application = web.Application(client_max_size=client_max_size)
             try:
                 application.add_routes(routes)
             except AttributeError:
