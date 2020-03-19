@@ -393,6 +393,11 @@ async def handleProxy(req):  # proxify "/_/<url>" with headers starting with "se
 
 getname = lambda x: x.rsplit(".", 1)[0].replace("/", ".")
 
+async def handlePost(req):
+    method = 'post_%s' % req.match_info.get("path", "")
+    for name, instance in currents.items():
+        if method in instance._routes:
+            return await instance._routes[method](req)
 
 async def handleWeb(req):  # serve all statics from web folder
     ressource = req.match_info.get("path", "")
@@ -749,11 +754,13 @@ class Base:
                         web.get("/_ws_{page}", wshandle),
                         web.get("/{path:.*}wuy.js", handleJs),
                         web.get("/", handleWeb),
+                        web.post("/{path:.+}", handlePost),
                         web.route("*", "/_/{url:.+}", handleProxy),
                         web.route("*", "/{path:.+}", handleWeb),
                      ]
 
-            application = web.Application()
+            client_max_size = cls._kwargs.get('client_max_size', 1024**2)
+            application = web.Application(client_max_size=client_max_size)
             try:
                 application.add_routes(routes)
             except AttributeError:
